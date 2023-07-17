@@ -1,0 +1,68 @@
+Ограничения на ниво таблица
+
+NULL
+DEFAULT
+PK (primary key)
+UK (unique)
+FK (foreign key)
+CHECK
+
+при null: 
+a	b
+1	null
+null	1
+null	null - възможно е
+null	null - не е възможно
+
+ако даден атрибут е външен ключ може да съдържа само стойности, които съществуват в свързаната (parent) таблица или null (ако няма ограничение за null)
+
+добре е да задаваме име на ограниченията (за null няма нужда)
+конвенция за именуване:
+pk_tablename
+uq_...
+fk_table1_table2
+ch_....
+...?
+
+когато искаме да добавим primary key към атрибут, който не е имал, ако атрибута може да приема null това не е възможно, т.е. първо 
+тябва да добавим ограничение за not null, а след това primary key
+
+при foregn key child и parent таблицата може да съвпадат
+CREATE TABLE container(
+	container_id INT NOT NULL,
+	parent_container INT,
+	PRIMARY KEY(container_id),
+	FOREIGN KEY(parent_container_id) REFERENCES container(container_id)
+);
+
+когато primary key се формира от множество атрибути не трябва при задаване на fk на друга таблица да реферираме част от fk
+например не може да се зададе
+	FK1 movieYear -> year
+	FK2 movieTitle -> title
+Правилното е
+	FOREIGN KEY(movieTitle, movieYear)
+	REFERENCES movie(title, year)
+__________________________________________________________
+добавяне на ограничения в съществуващи таблиц
+
+parent	child
+a	b    c
+1	1    1
+2	2    2
+3	null 2
+
+ако е избрана политиката no action ако искаме да изтрием първия кортеж от parent, това няма да може да бъде извършено, защото има стойности в child, които го реферират
+ако е избрана политиката cascade и искаме да изтрием първия кортеж от parent, всичко в child ще бъде изтрито, което го реферира
+при set null в child таблицата стойностите, които реферират 1 ще станат null
+при set default в child таблицата стойностите, които реферират 1 ще приемат стойността си по подразбиране, ако тя съществува в parent таблицата
+
+синтаксис
+...,
+FOREIGN KEY (movieTitle, movieYear)
+REFERENCES movie(title, year)
+ON DELETE NO ACTION
+ON UPDATE CASCADE
+);
+
+SELECT *
+FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS;

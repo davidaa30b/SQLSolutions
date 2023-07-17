@@ -1,0 +1,126 @@
+Преговор
+
+Модифициране на данни:
+insert into t(a1, a2,...) values (v1,v2,..), (v1 ...) , ...
+insert into t(a1, a2,...) select ...
+
+update t set a = <expresion> where ...(where is optional)
+
+delete from t where...(where is optional,without where whole table is deleted)
+
+default e ограничение, когато не е дефинирана стойност задавастойност null
+
+
+Създаване на бази данни:
+Create database db_name
+Use db_name
+
+типове данни:bit, int, (var)char, decimal, date, time
+
+create table t(
+att_name <type>,
+...);
+
+select attributes 
+into new_t
+from t
+
+
+alter table t :
+
+1. add att_name <type>, ...
+2. drop column att_name, ...
+3. alter column att_name
+
+не може да се добави колона с not null ограничение в таблица, в която има кортежи
+
+
+drop table t; 
+
+ограничения:
+primary key
+unique key 
+foreign key
+check
+default
+null
+
+не може да се премахне атрибут ако за него има зададени ограничения
+
+alter table
+add constraint <name> (att_name)
+
+create table t
+att_name <type> primary key,
+
+или
+
+create table t
+att_name <type>
+...
+constraint pk_t primary key(att_name)
+
+
+parent 				child
+primary key/unique key		foreign key
+
+политики(при модификации в parent таблица)
+по подразбиране:no action
+cascade-при модифициране сеизвършват същите промени и в child
+set null-ако не същстува в parent не може да се изпълни
+set default-също като горното
+
+child и parent може да са една и съща таблица
+
+check(condition1, condition2...)
+
+null/default
+
+default: with values задава стойност по подразбиране
+
+
+изгледи:
+
+нема собствени данни,използва се за текуща база данни
+може да се използват за извличане и модифициране на данни
+
+vreate veiw v_name
+as (select...)
+
+колоните трябва да са с уникални имена, те се задават или в select заявката или след името на изгледа
+
+опционално се задава 
+with check option
+
+индекси:
+
+всяка таблица може да има само 1 клъстериран индекс
+влистата на клъстерирания индекс има ключови стойности за ключа и съоветните кортежи(пример за кл. индекс е телефонен указател)
+уникален индекс не позволява два кортежа с една и съща стойност
+
+на уникален ключ автоматично се създава неклъстериран уникален индекс
+
+
+Тригери:
+видове-after и instead of
+
+работят inserted и deleted таблици
+inserted пази информация за вмъкнати и модифицирани кортежи след модификацията
+deleted пази информация за изтрити и модифицирани кортежи преди модификацията
+
+за едно действие може да има няколко after тригера но само един instead of тригер
+instead of тригерите могат да се създават за таблици иизгледи, другите само за таблици
+задействат се при настъпване на определени събития insert/update/delete
+
+използват се за одитни цели, отмяна на някои операции, да се провери състоянието на данните преди/след модификация и др.
+
+
+Транзакции:
+съвкупност от dml операции
+
+атомарни са-ако една транзакция не завърши, всичките се отменят
+
+аномалии:
+dirty read-чете непотвърдени промени
+norepeatable read-чете потвърдени промени
+phantom read-чете потвърдени промени

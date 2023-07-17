@@ -1,0 +1,103 @@
+Създаване на таблици с бази данни
+
+Типове данни:
+-целочислен тип-bigint(8 bytes), int(4 bytes), smallint(2 bytes), tinyint(1 byte)
+
+-BIT(boolean)-приема 0, 1 и NULL
+
+-децетичен(decimal)-(precision, scale) се оказват, стойности по подразбиране (18, 0), пр: (5, 2) -> 123,45 (общо цифри, цифри след дес.запетая)	
+	винаги се заделя място за scale, 1234,56(5, 2) няма да се запише
+
+-float & real-плаваща запетая,
+
+-char & varchar-char се използва за низове с фиксирана дължина, char(5), при запис на абв ще се запише 'абв__' и последните два символа ще се игнорират
+	varchar(5) не се допълва с празни символи, а заделя памет за символите и 2 байта за началото и края
+
+-data & time- 2 варианта datetime: 1753.01.01 - 9999.12.31 и datetime2: 0001.01.01 - 9999.12.31
+
+
+Дефиниране на схема на релация
+
+Create Database <name>
+Use Database <name>
+
+
+Create table <name>
+(
+<name of column> <datatype>(size)
+....
+);
+
+Пр:
+create table studio
+(id int IDENTITY(1, 1) (начална стойност, инкремент)
+name varchar(50)
+address varchar(50)
+pcert# int);
+
+insert into studio
+(name, address, pcert#) //не се задава ръчно id защото се инкрементира само
+values('ime', 'adres', 1234);
+
+
+
+select <name>
+into <new table name>
+from <existing table name>
+where...
+
+Пр:
+Select title as ctitle, year, length, studioname, producerc#
+Into coloredMovie
+From movie
+Where incolor='y';
+
+
+
+Alter table <name>
+Add <col name> <datatype>(size)
+
+Alter table <name>
+Alter column <name>
+<datatype>(size);
+
+Alter table <name>
+Drop column <col name>
+
+Пр:
+
+Alter table moviestar
+Add phone char(16) not NULL;
+
+
+Create table <name>
+(<col name> <datatype>(size) default <const expresion>
+
+Alter table <name>
+Add <col name> <datatype>(size)
+default <const expresion>
+
+Alter table <name>
+Add default <const expresion>
+For <col name>
+
+Пр:
+
+Create table moviestar
+(...
+phone char(16) default 'unlisted'
+
+
+Alter table moviestar
+Add phone char(16) default 'unlisted' with values; //забранява NULL стойност
+
+Alter table moviestar
+Add default 'unlisted'
+For phone;//когато phone присъствав схемата на БД
+
+
+Drop table <name> // изтрива таблицата
+
+Delete from <name> //изтрива кортежите но таблицата остава
+
+Drop database <name>

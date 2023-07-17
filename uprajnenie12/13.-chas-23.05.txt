@@ -1,0 +1,138 @@
+Транзакции 
+
+Свойства:
+->атомарност (atomicity) - ако една не се изпълни, всички отпадат и данните остават в първонач. им състояние
+->цялостност (consistency)
+->изолирано изпълнение (isolation)
+->устойчивост(durability)-данните се запазват при  срив
+
+помнят се лесно като acid
+
+Синтаксис:
+
+Begin transaction ...
+
+приключва с commit или с rollback
+commit запазва промените
+rollback отхвърля промените
+преди тях данните могат да бъдат възстановени
+
+
+sells(bar, beer, piece)
+
+В бара на Иван
+bolyarka: 2.50
+astika: 3.00
+
+Иска да започне да продава само Heineken: 3.50
+
+Ана иска да направи справка за най_скъпата бира
+
+Ана:					Иван:
+Select max(price)			Delete from sells
+From sells				Where bar='Bar Ivan'
+Where bar='Bar Ivan'			
+					Insert into sells
+Select min(price)			Values('Bar Ivan', 'Heineken', 3.50)
+From sells
+Where bar='Bar Ivan'
+
+Ако операторите се изпълнят в ред (max) (del) (ins) (min)
+						3.00  .	.	3.50
+
+Трябва Ана да изпълни заявката си в един Select.
+
+			Dirty read | Norepeatable read | Phantom read
+Read uncommited: 	    не		да			да		
+Read commited:	    	    не		да			да		
+Reletable read:       	    не		не			да		
+Serializable:	   	    не		не			не		
+
+Dirty read позволява четене на непотвърдени данни
+Norepeatable read позволяват четене на потвърдени данни с Update
+Phantom read позволяват четене на потвърдени данни с Insert/Delete
+
+Set transaction isolation level X; //Х = някоя от колоните
+
+
+Create table game_points(
+name varchar(15) primary key,
+points int);
+
+Insert into gamepoints
+Values('ok', 40), ('good', 50), ('awesome', 60);
+
+name    | 	points
+--------------------
+ok	  |	40
+good	  |	50
+awesome   |	60
+
+
+Begin transaction;
+Delete From game_points;  -> Ще изтрие всички кортежи.
+Commit
+
+Begin Transaction;
+Delete From game_points;  -> Няма да изтрие нищо.
+Rollback;
+
+t1:
+Begin transaction;
+Update game_points 
+Set points=30
+Where name='ok'
+
+insert into game_points
+Values ('bad', 0)
+
+Update game_points 
+Set points=10
+Where name='ok'
+
+t2:
+begin transaction;
+set transaction isolation level SERIALIZABLE;
+select avg(points) from game_points;
+commit;
+
+name       		old points    new ponits
+ok_game        	   	   40        	10
+good_game		   50        	50
+awesome_game    	   60        	60
+bad_game    	    	    X	       	 0
+
+avg:       50            30
+        t2 < t1        t1 < t2
+
+
+name        			points
+ok_game        			  40
+good_game    			  50
+awesome_game    		  60
+
+
+Begin transaction;
+Update game_points
+Set points=10
+Where nake='ok'
+Save transaction update_done
+
+Insert into game_points
+Values('bad', 0);
+Save transaction insert_done
+
+1. Rollback update_done - отменя се всичко след update_done маркера
+
+2. Rollback insert_done - отменя се всичко след insert_done маркера(понеже няма нищо, нищо не се отменя)
+
+
+
+
+
+
+
+
+
+
+
